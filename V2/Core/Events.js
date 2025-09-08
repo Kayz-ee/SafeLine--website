@@ -1,10 +1,7 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Events = void 0;
 // This file is manually maintained
-const StripeResource_js_1 = require("../../../StripeResource.js");
-const stripeMethod = StripeResource_js_1.StripeResource.method;
-exports.Events = StripeResource_js_1.StripeResource.extend({
+import { StripeResource } from '../../../StripeResource.js';
+const stripeMethod = StripeResource.method;
+export const Events = StripeResource.extend({
     retrieve(...args) {
         const transformResponseData = (response) => {
             return this.addFetchRelatedObjectIfNeeded(response);
