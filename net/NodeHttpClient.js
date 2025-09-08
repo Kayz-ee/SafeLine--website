@@ -1,9 +1,6 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.NodeHttpClientResponse = exports.NodeHttpClient = void 0;
-const http_ = require("http");
-const https_ = require("https");
-const HttpClient_js_1 = require("./HttpClient.js");
+import * as http_ from 'http';
+import * as https_ from 'https';
+import { HttpClient, HttpClientResponse, } from './HttpClient.js';
 // `import * as http_ from 'http'` creates a "Module Namespace Exotic Object"
 // which is immune to monkey-patching, whereas http_.default (in an ES Module context)
 // will resolve to the same thing as require('http'), which is
@@ -18,7 +15,7 @@ const defaultHttpsAgent = new https.Agent({ keepAlive: true });
  * HTTP client which uses the Node `http` and `https` packages to issue
  * requests.`
  */
-class NodeHttpClient extends HttpClient_js_1.HttpClient {
+export class NodeHttpClient extends HttpClient {
     constructor(agent) {
         super();
         this._agent = agent;
@@ -44,7 +41,7 @@ class NodeHttpClient extends HttpClient_js_1.HttpClient {
                 ciphers: 'DEFAULT:!aNULL:!eNULL:!LOW:!EXPORT:!SSLv2:!MD5',
             });
             req.setTimeout(timeout, () => {
-                req.destroy(HttpClient_js_1.HttpClient.makeTimeoutError());
+                req.destroy(HttpClient.makeTimeoutError());
             });
             req.on('response', (res) => {
                 resolve(new NodeHttpClientResponse(res));
@@ -70,8 +67,7 @@ class NodeHttpClient extends HttpClient_js_1.HttpClient {
         return requestPromise;
     }
 }
-exports.NodeHttpClient = NodeHttpClient;
-class NodeHttpClientResponse extends HttpClient_js_1.HttpClientResponse {
+export class NodeHttpClientResponse extends HttpClientResponse {
     constructor(res) {
         // @ts-ignore
         super(res.statusCode, res.headers || {});
@@ -105,4 +101,3 @@ class NodeHttpClientResponse extends HttpClient_js_1.HttpClientResponse {
         });
     }
 }
-exports.NodeHttpClientResponse = NodeHttpClientResponse;

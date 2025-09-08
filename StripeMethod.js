@@ -1,8 +1,5 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.stripeMethod = void 0;
-const utils_js_1 = require("./utils.js");
-const autoPagination_js_1 = require("./autoPagination.js");
+import { callbackifyPromiseWithTimeout, extractUrlParams } from './utils.js';
+import { makeAutoPaginationMethods } from './autoPagination.js';
 /**
  * Create an API method from the declared spec.
  *
@@ -21,16 +18,15 @@ const autoPagination_js_1 = require("./autoPagination.js");
  *
  * <!-- Public API accessible via Stripe.StripeResource.method -->
  */
-function stripeMethod(spec) {
+export function stripeMethod(spec) {
     if (spec.path !== undefined && spec.fullPath !== undefined) {
         throw new Error(`Method spec specified both a 'path' (${spec.path}) and a 'fullPath' (${spec.fullPath}).`);
     }
     return function (...args) {
         const callback = typeof args[args.length - 1] == 'function' && args.pop();
-        spec.urlParams = (0, utils_js_1.extractUrlParams)(spec.fullPath || this.createResourcePathWithSymbols(spec.path || ''));
-        const requestPromise = (0, utils_js_1.callbackifyPromiseWithTimeout)(this._makeRequest(args, spec, {}), callback);
-        Object.assign(requestPromise, (0, autoPagination_js_1.makeAutoPaginationMethods)(this, args, spec, requestPromise));
+        spec.urlParams = extractUrlParams(spec.fullPath || this.createResourcePathWithSymbols(spec.path || ''));
+        const requestPromise = callbackifyPromiseWithTimeout(this._makeRequest(args, spec, {}), callback);
+        Object.assign(requestPromise, makeAutoPaginationMethods(this, args, spec, requestPromise));
         return requestPromise;
     };
 }
-exports.stripeMethod = stripeMethod;

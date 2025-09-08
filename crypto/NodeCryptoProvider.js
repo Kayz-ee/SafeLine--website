@@ -1,12 +1,9 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.NodeCryptoProvider = void 0;
-const crypto = require("crypto");
-const CryptoProvider_js_1 = require("./CryptoProvider.js");
+import * as crypto from 'crypto';
+import { CryptoProvider } from './CryptoProvider.js';
 /**
  * `CryptoProvider which uses the Node `crypto` package for its computations.
  */
-class NodeCryptoProvider extends CryptoProvider_js_1.CryptoProvider {
+export class NodeCryptoProvider extends CryptoProvider {
     /** @override */
     computeHMACSignature(payload, secret) {
         return crypto
@@ -27,4 +24,3 @@ class NodeCryptoProvider extends CryptoProvider_js_1.CryptoProvider {
             .digest());
     }
 }
-exports.NodeCryptoProvider = NodeCryptoProvider;

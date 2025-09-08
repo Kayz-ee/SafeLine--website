@@ -1,8 +1,5 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.FetchHttpClientResponse = exports.FetchHttpClient = void 0;
-const utils_js_1 = require("../utils.js");
-const HttpClient_js_1 = require("./HttpClient.js");
+import { parseHeadersForFetch } from '../utils.js';
+import { HttpClient, HttpClientResponse, } from './HttpClient.js';
 /**
  * HTTP client which uses a `fetch` function to issue requests.
  *
@@ -11,7 +8,7 @@ const HttpClient_js_1 = require("./HttpClient.js");
  * Fetch API. As an example, this could be the function provided by the
  * node-fetch package (https://github.com/node-fetch/node-fetch).
  */
-class FetchHttpClient extends HttpClient_js_1.HttpClient {
+export class FetchHttpClient extends HttpClient {
     constructor(fetchFn) {
         super();
         // Default to global fetch if available
@@ -42,7 +39,7 @@ class FetchHttpClient extends HttpClient_js_1.HttpClient {
             const timeoutPromise = new Promise((_, reject) => {
                 pendingTimeoutId = setTimeout(() => {
                     pendingTimeoutId = null;
-                    reject(HttpClient_js_1.HttpClient.makeTimeoutError());
+                    reject(HttpClient.makeTimeoutError());
                 }, timeout);
             });
             const fetchPromise = fetchFn(url, init);
@@ -59,7 +56,7 @@ class FetchHttpClient extends HttpClient_js_1.HttpClient {
             const abort = new AbortController();
             let timeoutId = setTimeout(() => {
                 timeoutId = null;
-                abort.abort(HttpClient_js_1.HttpClient.makeTimeoutError());
+                abort.abort(HttpClient.makeTimeoutError());
             }, timeout);
             try {
                 return await fetchFn(url, Object.assign(Object.assign({}, init), { signal: abort.signal }));
@@ -69,7 +66,7 @@ class FetchHttpClient extends HttpClient_js_1.HttpClient {
                 // and instead it always throws an AbortError
                 // We catch this case to normalise all timeout errors
                 if (err.name === 'AbortError') {
-                    throw HttpClient_js_1.HttpClient.makeTimeoutError();
+                    throw HttpClient.makeTimeoutError();
                 }
                 else {
                     throw err;
@@ -98,14 +95,13 @@ class FetchHttpClient extends HttpClient_js_1.HttpClient {
         const body = requestData || (methodHasPayload ? '' : undefined);
         const res = await this._fetchFn(url.toString(), {
             method,
-            headers: (0, utils_js_1.parseHeadersForFetch)(headers),
+            headers: parseHeadersForFetch(headers),
             body: typeof body === 'object' ? JSON.stringify(body) : body,
         }, timeout);
         return new FetchHttpClientResponse(res);
     }
 }
-exports.FetchHttpClient = FetchHttpClient;
-class FetchHttpClientResponse extends HttpClient_js_1.HttpClientResponse {
+export class FetchHttpClientResponse extends HttpClientResponse {
     constructor(res) {
         super(res.status, FetchHttpClientResponse._transformHeadersToObject(res.headers));
         this._res = res;
@@ -139,4 +135,3 @@ class FetchHttpClientResponse extends HttpClient_js_1.HttpClientResponse {
         return headersObj;
     }
 }
-exports.FetchHttpClientResponse = FetchHttpClientResponse;
